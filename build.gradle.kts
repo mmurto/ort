@@ -179,6 +179,8 @@ subprojects {
 
             // Ensure all API library versions match our core library version.
             force("org.apache.logging.log4j:log4j-api:$log4jCoreVersion")
+
+            force("org.jetbrains.kotlin:kotlin-reflect:$kotlinPluginVersion")
         }
     }
 
@@ -247,7 +249,9 @@ subprojects {
                 "kotest.assertions.multi-line-diff",
                 "kotest.tags.include",
                 "kotest.tags.exclude"
-            ).associateWith { System.getProperty(it) }
+            ).associateWith { System.getProperty(it) } + mapOf(
+                "gradle.build.dir" to project.buildDir
+            )
 
             testLogging {
                 events = setOf(TestLogEvent.STARTED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
