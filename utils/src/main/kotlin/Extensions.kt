@@ -323,8 +323,8 @@ fun Throwable.collectMessages(): List<String> {
     val messages = mutableListOf<String>()
     var cause: Throwable? = this
     while (cause != null) {
-        val suppressed = cause.suppressed.joinToString { "\nSuppressed: ${it.javaClass.simpleName}: ${it.message}" }
-        messages += "${cause.javaClass.simpleName}: ${cause.message}$suppressed"
+        val suppressed = cause.suppressed.joinToString("\n") { "Suppressed: ${it.javaClass.simpleName}: ${it.message}" }
+        messages += "${cause.javaClass.simpleName}: ${cause.message}\n$suppressed"
         cause = cause.cause
     }
     return messages
