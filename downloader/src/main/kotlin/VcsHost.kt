@@ -210,7 +210,7 @@ enum class VcsHost(
 
     companion object {
         /**
-         * Return all [VcsInfo] that can be extracted from [projectUrl] by the applicable host.
+         * Return all [VcsInfo] that can be parsed from [projectUrl] without actually making a network request.
          */
         fun toVcsInfo(projectUrl: String): VcsInfo {
             val vcs = try {
