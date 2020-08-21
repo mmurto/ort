@@ -198,34 +198,36 @@ subprojects {
         }
     }
 
-    tasks.named<DokkaTask>("dokka") {
-        configuration {
-            jdkVersion = 8
+    tasks.dokkaHtml.configure {
+        dokkaSourceSets {
+            configureEach {
+                jdkVersion = 8
 
-            externalDocumentationLink {
-                val baseUrl = "https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs"
-                url = URL(baseUrl)
-                packageListUrl = URL("$baseUrl/package-list")
-            }
+                externalDocumentationLink {
+                    val baseUrl = "https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs"
+                    url = URL(baseUrl)
+                    packageListUrl = URL("$baseUrl/package-list")
+                }
 
-            externalDocumentationLink {
-                val majorMinorVersion = jacksonVersion.split('.').let { "${it[0]}.${it[1]}" }
-                val baseUrl = "https://fasterxml.github.io/jackson-databind/javadoc/$majorMinorVersion"
-                url = URL(baseUrl)
-                packageListUrl = URL("$baseUrl/package-list")
-            }
+                externalDocumentationLink {
+                    val majorMinorVersion = jacksonVersion.split('.').let { "${it[0]}.${it[1]}" }
+                    val baseUrl = "https://fasterxml.github.io/jackson-databind/javadoc/$majorMinorVersion"
+                    url = URL(baseUrl)
+                    packageListUrl = URL("$baseUrl/package-list")
+                }
 
-            externalDocumentationLink {
-                val baseUrl = "https://jakewharton.github.io/DiskLruCache"
-                url = URL(baseUrl)
-                packageListUrl = URL("$baseUrl/package-list")
-            }
+                externalDocumentationLink {
+                    val baseUrl = "https://jakewharton.github.io/DiskLruCache"
+                    url = URL(baseUrl)
+                    packageListUrl = URL("$baseUrl/package-list")
+                }
 
-            externalDocumentationLink {
-                val majorVersion = log4jCoreVersion.substringBefore('.')
-                val baseUrl = "https://logging.apache.org/log4j/$majorVersion.x/log4j-api/apidocs"
-                url = URL(baseUrl)
-                packageListUrl = URL("$baseUrl/package-list")
+                externalDocumentationLink {
+                    val majorVersion = log4jCoreVersion.substringBefore('.')
+                    val baseUrl = "https://logging.apache.org/log4j/$majorVersion.x/log4j-api/apidocs"
+                    url = URL(baseUrl)
+                    packageListUrl = URL("$baseUrl/package-list")
+                }
             }
         }
     }
@@ -299,27 +301,17 @@ subprojects {
         from(sourceSets["main"].allSource)
     }
 
-    val dokka by tasks.existing(DokkaTask::class) {
-        description = "Generates minimalistic HTML documentation, Java classes are translated to Kotlin."
-    }
-
     val dokkaJar by tasks.registering(Jar::class) {
-        dependsOn(dokka)
+        dependsOn(tasks.dokkaHtml)
 
         description = "Assembles a jar archive containing the minimalistic HTML documentation."
         group = "Documentation"
 
         archiveClassifier.set("dokka")
-        from(dokka.get().outputDirectory)
+        from(tasks.dokkaHtml)
     }
 
-    val dokkaJavadoc by tasks.registering(DokkaTask::class) {
-        description = "Generates documentation that looks like normal Javadoc, Kotlin classes are translated to Java."
-        outputFormat = "javadoc"
-        outputDirectory = "$buildDir/javadoc"
-    }
-
-    val javadocJar by tasks.registering(Jar::class) {
+    /*val javadocJar by tasks.registering(Jar::class) {
         dependsOn(dokkaJavadoc)
 
         description = "Assembles a jar archive containing the Javadoc documentation."
@@ -327,7 +319,7 @@ subprojects {
 
         archiveClassifier.set("javadoc")
         from(dokkaJavadoc.get().outputDirectory)
-    }
+    }*/
 
     configure<PublishingExtension> {
         publications {
@@ -336,7 +328,7 @@ subprojects {
 
                 from(components["java"])
                 artifact(sourcesJar.get())
-                artifact(javadocJar.get())
+                //artifact(javadocJar.get())
 
                 pom {
                     licenses {
